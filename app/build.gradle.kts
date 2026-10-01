@@ -1,13 +1,13 @@
 plugins {
+    // AGP 9 以降は Kotlin サポートが内蔵されるため kotlin.android は適用しない
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "jp.liftcho.app"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "jp.liftcho.app"

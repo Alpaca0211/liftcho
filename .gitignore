@@ -6,3 +6,10 @@ local.properties
 .cxx/
 captures/
 .kotlin/
+# 署名まわり（絶対にコミットしない）
+*.jks
+*.keystore
+keystore.properties
+# 配布物
+*.apk
+*.aab

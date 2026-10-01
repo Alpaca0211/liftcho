@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "リフト帳"
+rootProject.name = "liftcho"
 include(":app")
