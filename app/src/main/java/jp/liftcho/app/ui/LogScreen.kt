@@ -194,7 +194,8 @@ fun LogScreen(repo: Repo, modifier: Modifier = Modifier) {
                             restEndAt = System.currentTimeMillis() + restTotal
                         }
                     },
-                    onAddSet = { scope.launch { repo.addSet(ex, logs) } }
+                    onAddSet = { scope.launch { repo.addSet(ex, logs) } },
+                    onRemoveSet = { scope.launch { repo.removeLastSet(logs, ex.id) } }
                 )
             }
         }
@@ -240,7 +241,8 @@ private fun ExerciseCard(
     onWeight: (SetLog, Double) -> Unit,
     onReps: (SetLog, Int) -> Unit,
     onToggle: (SetLog) -> Unit,
-    onAddSet: () -> Unit
+    onAddSet: () -> Unit,
+    onRemoveSet: () -> Unit
 ) {
     val complete = rows.isNotEmpty() && rows.all { it.done }
     Card(
@@ -308,8 +310,19 @@ private fun ExerciseCard(
                     }
                 }
             }
-            TextButton(onClick = onAddSet, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)) {
-                Text("＋ セット", fontSize = 13.sp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                TextButton(onClick = onAddSet, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)) {
+                    Text("＋ セット", fontSize = 13.sp)
+                }
+                // 記録済みのセットは消さない。消せるのは未記録の最後の1セットだけ
+                val removable = rows.size > 1 && !rows.last().done
+                TextButton(
+                    onClick = onRemoveSet,
+                    enabled = removable,
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text("− セット", fontSize = 13.sp)
+                }
             }
         }
     }

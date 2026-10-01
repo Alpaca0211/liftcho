@@ -86,6 +86,12 @@ interface LiftDao {
 
     @Query("SELECT * FROM set_logs WHERE date = :date AND done = 1 ORDER BY exerciseId, setNo")
     suspend fun doneSetsOf(date: String): List<SetLog>
+
+    @Query(
+        "DELETE FROM set_logs WHERE date = :date AND dayKey = :dayKey " +
+            "AND exerciseId = :exerciseId AND setNo = :setNo"
+    )
+    suspend fun deleteSet(date: String, dayKey: String, exerciseId: String, setNo: Int)
 }
 
 @Database(entities = [Exercise::class, SetLog::class], version = 1, exportSchema = true)
@@ -147,6 +153,14 @@ class Repo(private val dao: LiftDao) {
         val rows = existing.filter { it.exerciseId == exercise.id }
         val last = rows.maxByOrNull { it.setNo } ?: return
         dao.insertLogs(listOf(last.copy(setNo = last.setNo + 1, done = false)))
+    }
+
+    /** 最後のセットを1つ削除する。記録済み（✓）のセットは消さない */
+    suspend fun removeLastSet(rows: List<SetLog>, exerciseId: String) {
+        val target = rows.filter { it.exerciseId == exerciseId }.maxByOrNull { it.setNo } ?: return
+        if (target.done) return
+        if (rows.count { it.exerciseId == exerciseId } <= 1) return
+        dao.deleteSet(target.date, target.dayKey, target.exerciseId, target.setNo)
     }
 
     suspend fun previousSession(exerciseId: String, before: String): List<SetLog> {
